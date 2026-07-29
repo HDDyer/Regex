@@ -1,6 +1,6 @@
 # Regex
 
-A small regex engine written in Rust. Implements Brzozwski derivatives in order to match a parsed regex pattern. 
+A regular expression engine written in Rust. Implements Brzozwski derivatives in order to match a parsed regex pattern.
 
 ## Features
 
