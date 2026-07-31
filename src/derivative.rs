@@ -145,7 +145,7 @@ fn shorthand_matches(kind: char, ch: char) -> bool {
     }
 }
 
-/// Recovers an owned `Node` from an `Rc<Node>`, to avoid a clone
+/// a shorthand to recover a Node from a Rc<Node>
 fn unwrap_rc(rc: Rc<Node>) -> Node {
     Rc::try_unwrap(rc).unwrap_or_else(|rc| (*rc).clone())
 }
@@ -192,7 +192,7 @@ fn simplify(node: Node) -> Node {
     }
 }
 
-/// Matches `input` against a parsed regex `node` by folding a Brzozowski
+/// Matches input against a parsed regex Node by folding a Brzozowski
 /// derivative over every character, then checking nullability at the end.
 pub fn is_match(node: &Node, input: &str) -> bool {
     let mut current = node.clone();

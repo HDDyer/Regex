@@ -7,7 +7,7 @@ pub enum Node {
     Empty,   // ∅
     Epsilon, // ε
 
-    ///  character literal a`, `b`, `c`
+    ///  character literal
     Literal(char),
     /// `.` any character wildcard
     AnyChar,
@@ -220,11 +220,14 @@ impl Parser {
         }
     }
 
+    // parse a class when the parser reaches a LBracket [
+    // [a-z]
     fn class(&mut self) -> Result<Node, ParseError> {
         let open_pos = self.pos - 1;
         let mut negated = false;
 
-        if let Some(Token::Caret) = self.peek() {
+        // classes starting with a Caret are negated
+        if let Some(Token::Caret) = self.peek() { 
             negated = true;
             self.advance();
         }
@@ -245,11 +248,15 @@ impl Parser {
                     }
                 }
                 Some(Token::Literal(c)) => {
+                    // get the start character 
+                    // ex: [a-z] -> a
                     let start = *c;
                     self.advance();
 
+                    // checks if there is a dash and a next character to form the end of the class-range. 
+                    // Otherwise just push a single character
                     if let Some(Token::Dash) = self.peek() 
-                        && let Some(Token::Literal(end)) = self.tokens.get(self.pos + 1) {
+                        && let Some(Token::Literal(end)) = self.tokens.get(self.pos + 1) { 
                         let end = *end;
                         if end < start {
                             return Err(ParseError::InvalidRange { start, end });
@@ -285,11 +292,13 @@ impl Parser {
 
         Ok(Node::Class { negated, items })
     }
-
+    
+    // parses a repeat range
     fn parse_range(&mut self) -> Result<(u32, Option<u32>), ParseError> {
         let min = self.parse_number()?;
         let mut max = Some(min);
 
+        // if the next character is a comma, check if a max character exists
         if let Some(Token::Comma) = self.peek() {
             self.advance();
             max = None;
@@ -300,6 +309,7 @@ impl Parser {
         Ok((min, max))
     }
 
+    // convert a character literal to a Result<u32, parseError>
     fn parse_number(&mut self) -> Result<u32, ParseError> {
         let mut digits = String::new();
         while let Some(Token::Literal(c)) = self.peek() {
